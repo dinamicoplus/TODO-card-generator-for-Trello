@@ -1,4 +1,11 @@
 import sys
+import requests
+
+def API_request(board,key,token):
+    params_ = {'key': key, 'token': token};
+    url = "https://api.trello.com/1/boards/" + board + "/lists";
+    response = requests.request("GET", url, params=params_);
+    print(response.text)
 
 # Clean the input string of blank lines and tabs
 # input:    String

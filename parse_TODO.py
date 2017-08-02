@@ -55,9 +55,16 @@ def filter_file(o_file):
     return todo_list;
 
 def main(argv):
-    todo_list = filter_file(argv[1]);
-    for l in todo_list:
-        print(l);
+    file_path = argv[1];
+    board_id = argv[2];
+    key = argv[3];
+    token = argv[4];
+
+    todo_text = filter_file(file_path);
+    todo_list_id = list_id_API_request(board_id,key,token);
+
+    for idx, l in enumerate(todo_text):
+        post_card_API_request(todo_list_id, key, token, "TODO n" + str(idx), desc = l);
 
 if __name__ == "__main__":
     main(sys.argv)

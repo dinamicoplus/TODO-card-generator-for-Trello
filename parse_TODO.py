@@ -1,10 +1,30 @@
 import sys
 import requests
+import json
 
-def API_request(board,key,token):
+# Calls Trello API to get the TODO list id
+# inputs:   board = String, key = String, token = String
+# output:   list_id = String
+def list_id_API_request(board, key, token):
     params_ = {'key': key, 'token': token};
     url = "https://api.trello.com/1/boards/" + board + "/lists";
     response = requests.request("GET", url, params=params_);
+    #print(response.text)
+    response_json=json.loads(response.text);
+    for l in response_json:
+        if 'name' in l:
+            if l['name']=='TODO':
+                list_id=l['id'];
+    return list_id;
+
+# Calls Trello API to post a card in the TODO list
+# inputs:   list_id = String, key = String, token = String
+#           name = String, desc(Optional) = String
+def post_card_API_request(list_id, key, token, name, desc=""):
+    params_ = {'key': key, 'token': token,
+            'name': name, 'desc': desc, 'idList': list_id};
+    url = "https://api.trello.com/1/cards";
+    response = requests.request("POST", url, params=params_);
     print(response.text)
 
 # Clean the input string of blank lines and tabs

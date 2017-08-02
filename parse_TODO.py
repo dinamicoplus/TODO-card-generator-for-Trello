@@ -4,7 +4,7 @@ import sys
 # input:    String
 # output:   String
 def clean_string(string):
-    cleaned_string = "\n".join([i for i in string.split("\n") if i.split()]);
+    cleaned_string = "\n".join([i.strip() for i in string.split("\n") if i.split()]);
     return(cleaned_string);
 
 # Filter the file and stores the TODO comments separated in

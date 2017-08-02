@@ -1,12 +1,20 @@
 import sys
 
+# Clean the input string of blank lines and tabs
+# input:    String
+# output:   String
+def clean_string(string):
+    cleaned_string = "\n".join([i for i in string.split("\n") if i.split()]);
+    return(cleaned_string);
+
 # Filter the file and stores the TODO comments separated in
 # the todo_list string list.
-def main(argv):
-
+# input:    String path
+# output:   String list
+def filter_file(o_file):
     todo_list = list();
     strg = "";
-    with open(argv[1]) as inf:
+    with open(o_file) as inf:
         for line in inf:
             if line.startswith("// TODO"):
                 # Remove the '// TODO ' part of the line
@@ -15,8 +23,12 @@ def main(argv):
                     strg = strg + line.split("//",1)[1];
             elif strg != "":
                 # Filter the string so it will remove blank lines
-                todo_list.append("\n".join([i for i in strg.split("\n") if i.split()]));
+                todo_list.append(clean_string(strg));
                 strg = "";
+    return todo_list;
+
+def main(argv):
+    todo_list = filter_file(argv[1]);
     for l in todo_list:
         print(l);
 

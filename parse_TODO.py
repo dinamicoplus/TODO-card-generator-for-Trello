@@ -1,3 +1,12 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+'''
+File: parse_TODO.py
+TODO card generator for Trello
+(C) 2017 Marcos Brito - marbri91@gmail.com
+License: MIT License
+'''
+
 import sys
 import requests
 import json

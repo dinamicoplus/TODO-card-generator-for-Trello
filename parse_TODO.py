@@ -32,6 +32,20 @@ def list_id_API_request(board, key, token):
                 list_id=l['id'];
     return list_id;
 
+# Calls Trello API to search for a board id thru its name
+# inputs:   name = String, key = String, token = String
+# output:   board_id = String
+def board_id_API_request(name, key, token):
+    params_ = {'key': key, 'token': token,
+            'query': name, 'board_fields': 'name'};
+    url = "https://api.trello.com/1/search"
+    response = requests.request("GET", url, params=params_);
+    response_json=json.loads(response.text);
+    if 'boards' in response_json:
+        for board in response_json['boards']:
+            board_id = board['id'];
+    return board_id;
+
 # Calls Trello API to post a card in the TODO list
 # inputs:   list_id = String, key = String, token = String
 #           name = String, desc(Optional) = String

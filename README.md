@@ -38,7 +38,11 @@ this script.
 
 ## Changes
 
-**current version: v0.2.0-alpha**
+**current version: v0.2.1-alpha**
+
+**v0.2.1**
+
+- Patched broken argument parsing
 
 **v0.2.0**
 

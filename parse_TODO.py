@@ -130,8 +130,10 @@ def main(args_):
         args = parser.parse_args(args_[1:])
 
     file_path = args.fpath;
-    board_id = args.bid;
-    board_name = args.bname;
+    if hasattr(args,'bid'):
+        board_id = args.bid;
+    if hasattr(args,'bname'):
+        board_name = args.bname;
     key = args.key;
     token = args.token;
     list_name = args.list_name;

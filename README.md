@@ -36,7 +36,7 @@ For more information about Trello API REST http://developers.trello.com
 Use ```python3 parser_TODO.py --help``` to get more information on how to use
 this script.
 
-# Changes
+## Changes
 
 **current version: v0.2.0-alpha**
 

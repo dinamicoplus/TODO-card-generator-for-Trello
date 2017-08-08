@@ -72,22 +72,30 @@ def filter_file(o_file):
     todo_list = list();
     desc = "";
     card = None;
+
+    ext = {
+        'c': '//',
+        'py': '#'
+    }
+
+    wildcard = ext[o_file.split('.')[1]]
     with open(o_file) as inf:
         for line in inf:
-            if line.startswith("// TODO"):
+            if line.startswith(wildcard + " TODO"):
                 card = Trello_card();
                 # Remove the '// TODO ' part of the line
-                card.name = line.split("// TODO ",1)[1].strip();
+                card.name = line.split(wildcard + " TODO",1)[1].strip();
                 if card.name == "":
                     card.name = "TODO - " + datetime.datetime.now().strftime("%Y-%m-%d");
 
-            elif card != None and line.startswith("//"):
-                    desc = desc + line.split("//",1)[1];
+            elif card != None and line.startswith(wildcard):
+                    desc = desc + line.split(wildcard,1)[1];
             elif card != None:
                 # Filter the string so it will remove blank lines
-                card.desc = clean_string(desc);
-                todo_list.append(card);
-                desc = "";
+                if desc != "":
+                    card.desc = clean_string(desc);
+                    todo_list.append(card);
+                    desc = "";
                 card = None;
     return todo_list;
 

@@ -68,7 +68,7 @@ def clean_string(string):
 # the todo_list string list.
 # input:    String path
 # output:   String list
-def filter_file(o_file):
+def filter_file(o_file,filetype = None):
     todo_list = list();
     desc = "";
     card = None;
@@ -78,7 +78,11 @@ def filter_file(o_file):
         'py': '#'
     }
 
-    wildcard = ext[o_file.split('.')[1]]
+    if filetype is None:
+        wildcard = ext[o_file.split('.')[1]]
+    else:
+        wildcard = ext[filetype]
+
     with open(o_file) as inf:
         for line in inf:
             if line.startswith(wildcard + " TODO"):
@@ -114,7 +118,10 @@ def main(args_):
 
     sp_trello = parser.add_subparsers()
 
-    p_trello = sp_trello.add_parser('trello',parents = [p_trello_path,p_trello_key, p_trello_token])
+    p_trello = sp_trello.add_parser('trello',parents = [p_trello_key, p_trello_token])
+
+    parser.add_argument('fpath', help = 'Source code path')
+    parser.add_argument('-la','--lang', help = 'The language of the source code')
 
     p_board_id = argparse.ArgumentParser(add_help=False)
     p_board_id.add_argument('bid', help = 'Trello board id')
@@ -143,7 +150,7 @@ def main(args_):
     list_name = args.list_name;
     list_id = args.list_id;
 
-    todo_cards = filter_file(file_path);
+    todo_cards = filter_file(file_path, filetype = args.lang);
     if hasattr(args, 'bid'):
         board_id = args.bid;
 

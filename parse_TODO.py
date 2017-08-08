@@ -119,7 +119,8 @@ def main(args_):
     g_list.add_argument('-lid','--list-id', help = 'List id in the selected board instead of the default TODO list')
     g_list.add_argument('-lname','--list-name', help = 'List name in the selected board instead of the default TODO list')
 
-    sp_board = p_trello.add_subparsers()
+    sp_board = p_trello.add_subparsers(dest = 'board')
+    sp_board.required = True
     sp_board.add_parser('with-board-id',parents = [p_board_id,p_list], help = 'Upload the found cards into the board with the id given')
     sp_board.add_parser('with-board-name',parents = [p_board_name,p_list], help = 'Upload the found cards into the first board found with the name given')
 
@@ -129,8 +130,10 @@ def main(args_):
         args = parser.parse_args(args_[1:])
 
     file_path = args.fpath;
-    board_id = args.bid;
-    board_name = args.bname;
+    if hasattr(args,'bid'):
+        board_id = args.bid;
+    if hasattr(args,'bname'):
+        board_name = args.bname;
     key = args.key;
     token = args.token;
     list_name = args.list_name;

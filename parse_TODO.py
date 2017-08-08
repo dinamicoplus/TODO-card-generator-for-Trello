@@ -143,7 +143,9 @@ def main(args_):
         board_name = args.bname;
         board_id = board_id_API_request(board_name, key, token);
 
-    if list_name is not None:
+    if list_id is not None:
+        todo_list_id = list_id;
+    elif list_name is not None:
         todo_list_id = list_id_API_request(board_id, key, token, list_name);
     else:
         todo_list_id = list_id_API_request(board_id, key, token, 'TODO');

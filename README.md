@@ -23,7 +23,7 @@ then the title of the card will be ```TODO - %Y-%m-%d```.
 An example of a typical usage:
 
 ```
-python3 parser_TODO.py trello <file_path> <key> <token> with-board-id <id>
+python3 parser_TODO.py trello <key> <token> with-board-id <id> <file_path>
 ```
 The previous command will create a Trello card for each *TODO* comment in the
 file and will post them in the *TODO* list inside the board with the id given.

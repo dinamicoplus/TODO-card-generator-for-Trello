@@ -21,7 +21,7 @@ class Trello_card:
 # Calls Trello API to get the TODO list id
 # inputs:   board = String, key = String, token = String
 # output:   list_id = String
-def list_id_API_request(board, key, token):
+def list_id_API_request(board, key, token, list_name):
     params_ = {'key': key, 'token': token};
     url = "https://api.trello.com/1/boards/" + board + "/lists";
     response = requests.request("GET", url, params=params_);
@@ -29,7 +29,7 @@ def list_id_API_request(board, key, token):
     response_json=json.loads(response.text);
     for l in response_json:
         if 'name' in l:
-            if l['name']=='TODO':
+            if l['name']==list_name:
                 list_id=l['id'];
     return list_id;
 
@@ -130,17 +130,25 @@ def main(args_):
         args = parser.parse_args(args_[1:])
 
     file_path = args.fpath;
-    if hasattr(args,'bid'):
-        board_id = args.bid;
-    if hasattr(args,'bname'):
-        board_name = args.bname;
     key = args.key;
     token = args.token;
     list_name = args.list_name;
     list_id = args.list_id;
 
     todo_cards = filter_file(file_path);
-    todo_list_id = list_id_API_request(board_id,key,token);
+    if hasattr(args, 'bid'):
+        board_id = args.bid;
+
+    if hasattr(args, 'bname'):
+        board_name = args.bname;
+        board_id = board_id_API_request(board_name, key, token);
+
+    if list_id is not None:
+        todo_list_id = list_id;
+    elif list_name is not None:
+        todo_list_id = list_id_API_request(board_id, key, token, list_name);
+    else:
+        todo_list_id = list_id_API_request(board_id, key, token, 'TODO');
 
     for idx, card in enumerate(todo_cards):
         post_card_API_request(todo_list_id, key, token, card.name, desc = card.desc);

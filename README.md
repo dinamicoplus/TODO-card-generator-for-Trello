@@ -38,7 +38,11 @@ this script.
 
 ## Changes
 
-**current version: v0.2.1-alpha**
+**current version: v0.3.0-alpha**
+
+**v0.3.0**
+
+- Implemented new optional arguments -lid and -lname
 
 **v0.2.1**
 

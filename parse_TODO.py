@@ -130,17 +130,20 @@ def main(args_):
         args = parser.parse_args(args_[1:])
 
     file_path = args.fpath;
-    if hasattr(args,'bid'):
-        board_id = args.bid;
-    if hasattr(args,'bname'):
-        board_name = args.bname;
     key = args.key;
     token = args.token;
     list_name = args.list_name;
     list_id = args.list_id;
 
     todo_cards = filter_file(file_path);
-    todo_list_id = list_id_API_request(board_id,key,token);
+    if hasattr(args, 'bid'):
+        board_id = args.bid;
+        todo_list_id = list_id_API_request(board_id, key, token);
+
+    if hasattr(args, 'bname'):
+        board_name = args.bname;
+        board_id = board_id_API_request(board_name, key, token);
+        todo_list_id = list_id_API_request(board_id, key, token);
 
     for idx, card in enumerate(todo_cards):
         post_card_API_request(todo_list_id, key, token, card.name, desc = card.desc);

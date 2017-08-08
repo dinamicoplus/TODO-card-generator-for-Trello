@@ -7,6 +7,7 @@ TODO card generator for Trello
 License: MIT License
 '''
 
+import argparse
 import datetime
 import sys
 import requests
@@ -31,6 +32,20 @@ def list_id_API_request(board, key, token):
             if l['name']=='TODO':
                 list_id=l['id'];
     return list_id;
+
+# Calls Trello API to search for a board id thru its name
+# inputs:   name = String, key = String, token = String
+# output:   board_id = String
+def board_id_API_request(name, key, token):
+    params_ = {'key': key, 'token': token,
+            'query': name, 'board_fields': 'name'};
+    url = "https://api.trello.com/1/search"
+    response = requests.request("GET", url, params=params_);
+    response_json=json.loads(response.text);
+    if 'boards' in response_json:
+        for board in response_json['boards']:
+            board_id = board['id'];
+    return board_id;
 
 # Calls Trello API to post a card in the TODO list
 # inputs:   list_id = String, key = String, token = String
@@ -76,11 +91,50 @@ def filter_file(o_file):
                 card = None;
     return todo_list;
 
-def main(argv):
-    file_path = argv[1];
-    board_id = argv[2];
-    key = argv[3];
-    token = argv[4];
+def main(args_):
+
+    parser = argparse.ArgumentParser(description='Process file to find TODO comments and upload them as cards to the preferred kanban board website')
+
+    p_trello_key = argparse.ArgumentParser(add_help=False)
+    p_trello_key.add_argument('key', help = 'Trello developer key')
+
+    p_trello_token = argparse.ArgumentParser(add_help=False)
+    p_trello_token.add_argument('token', help = 'Trello developer token')
+
+    p_trello_path = argparse.ArgumentParser(add_help=False)
+    p_trello_path.add_argument('fpath', help = 'Source code path')
+
+    sp_trello = parser.add_subparsers()
+
+    p_trello = sp_trello.add_parser('trello',parents = [p_trello_path,p_trello_key, p_trello_token])
+
+    p_board_id = argparse.ArgumentParser(add_help=False)
+    p_board_id.add_argument('bid', help = 'Trello board id')
+
+    p_board_name = argparse.ArgumentParser(add_help=False)
+    p_board_name.add_argument('bname', help = 'Trello board name')
+
+    p_list = argparse.ArgumentParser(add_help=False)
+    g_list = p_list.add_mutually_exclusive_group()
+    g_list.add_argument('-lid','--list-id', help = 'List id in the selected board instead of the default TODO list')
+    g_list.add_argument('-lname','--list-name', help = 'List name in the selected board instead of the default TODO list')
+
+    sp_board = p_trello.add_subparsers()
+    sp_board.add_parser('with-board-id',parents = [p_board_id,p_list], help = 'Upload the found cards into the board with the id given')
+    sp_board.add_parser('with-board-name',parents = [p_board_name,p_list], help = 'Upload the found cards into the first board found with the name given')
+
+    if not len(args_[1:]) > 1:
+        parser.parse_args(['-h'])
+    else:
+        args = parser.parse_args(args_[1:])
+
+    file_path = args.fpath;
+    board_id = args.bid;
+    board_name = args.bname;
+    key = args.key;
+    token = args.token;
+    list_name = args.list_name;
+    list_id = args.list_id;
 
     todo_cards = filter_file(file_path);
     todo_list_id = list_id_API_request(board_id,key,token);

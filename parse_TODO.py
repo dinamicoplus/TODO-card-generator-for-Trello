@@ -66,9 +66,9 @@ def clean_string(string):
 
 # Filter the file and stores the TODO comments separated in
 # the todo_list string list.
-# input:    String path
+# input:    o_file = String path, filetype(Optional) = String
 # output:   String list
-def filter_file(o_file,filetype = None):
+def searchAllCardsOnFile(o_file,filetype = None):
     todo_list = list();
     desc = "";
     card = None;
@@ -150,7 +150,7 @@ def main(args_):
     list_name = args.list_name;
     list_id = args.list_id;
 
-    todo_cards = filter_file(file_path, filetype = args.lang);
+    todo_cards = searchAllCardsOnFile(file_path, filetype = args.lang);
     if hasattr(args, 'bid'):
         board_id = args.bid;
 

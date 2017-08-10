@@ -141,6 +141,7 @@ def main(args_):
 
     parser.add_argument('fpath', help = 'Source code path')
     parser.add_argument('-la','--lang', help = 'The language of the source code')
+    parser.add_argument('-wi','--write-card-id', help = 'Writes the card id in the TODO comment after posted', action='store_true')
 
     p_board_id = argparse.ArgumentParser(add_help=False)
     p_board_id.add_argument('bid', help = 'Trello board id')
@@ -188,7 +189,8 @@ def main(args_):
         if card.t_id == "":
             post_card_API_request(todo_list_id, key, token, card);
             # Write id in TODO comment
-            add_id_TODO_comment(file_path,card);
+            if args.write_card_id == True:
+                add_id_TODO_comment(file_path,card);
 
 if __name__ == "__main__":
     main(sys.argv)

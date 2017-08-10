@@ -14,9 +14,13 @@ import requests
 import json
 
 class Trello_card:
-    def __init__(self,name = "",desc = ""):
+    def __eq__(self, other):
+            return self.__dict__ == other.__dict__
+    def __init__(self, name = "", desc = "", line = 0, t_id = ""):
         self.name = name;
         self.desc = desc;
+        self.line = line;
+        self.t_id = t_id;
 
 # Calls Trello API to get the TODO list id
 # inputs:   board = String, key = String, token = String
@@ -50,11 +54,12 @@ def board_id_API_request(name, key, token):
 # Calls Trello API to post a card in the TODO list
 # inputs:   list_id = String, key = String, token = String
 #           name = String, desc(Optional) = String
-def post_card_API_request(list_id, key, token, name, desc=""):
+def post_card_API_request(list_id, key, token, card):
     params_ = {'key': key, 'token': token,
-            'name': name, 'desc': desc, 'idList': list_id};
+            'name': card.name, 'desc': card.desc, 'idList': list_id};
     url = "https://api.trello.com/1/cards";
     response = requests.request("POST", url, params=params_);
+    card.t_id = response.json()['id']
     print(response.text)
 
 # Clean the input string of blank lines and tabs
@@ -66,9 +71,9 @@ def clean_string(string):
 
 # Filter the file and stores the TODO comments separated in
 # the todo_list string list.
-# input:    String path
+# input:    o_file = String path, filetype(Optional) = String
 # output:   String list
-def filter_file(o_file,filetype = None):
+def searchAllCardsOnFile(o_file,filetype = None):
     todo_list = list();
     desc = "";
     card = None;
@@ -84,17 +89,20 @@ def filter_file(o_file,filetype = None):
         wildcard = ext[filetype]
 
     with open(o_file) as inf:
-        for line in inf:
+        for idx, line in enumerate(inf):
             if line.startswith(wildcard + " TODO"):
                 card = Trello_card();
+                card.line = idx; # Do not like the solution
                 # Remove the '// TODO ' part of the line
-                card.name = line.split(wildcard + " TODO",1)[1].strip();
+                card.name = line.split(wildcard + " TODO",1)[1].strip().split(" - ")[0].strip();
+                if len(line.split(" - ",1))>1:
+                    card.t_id = line.split(" - ",1)[1].strip();
                 if card.name == "":
                     card.name = "TODO - " + datetime.datetime.now().strftime("%Y-%m-%d");
 
-            elif card != None and line.startswith(wildcard):
+            elif card is not None and line.startswith(wildcard):
                     desc = desc + line.split(wildcard,1)[1];
-            elif card != None:
+            elif card is not None:
                 # Filter the string so it will remove blank lines
                 if desc != "":
                     card.desc = clean_string(desc);
@@ -102,6 +110,17 @@ def filter_file(o_file,filetype = None):
                     desc = "";
                 card = None;
     return todo_list;
+
+# Do not like this solution
+def add_id_TODO_comment(o_file,card):
+    with open(o_file, 'r') as f:
+        data = f.readlines()
+
+    if card.t_id != "":
+        data[card.line] = data[card.line].strip() + " - " + card.t_id + "\n"
+
+    with open(o_file, 'w') as f:
+        f.writelines(data);
 
 def main(args_):
 
@@ -122,6 +141,7 @@ def main(args_):
 
     parser.add_argument('fpath', help = 'Source code path')
     parser.add_argument('-la','--lang', help = 'The language of the source code')
+    parser.add_argument('-wi','--write-card-id', help = 'Writes the card id in the TODO comment after posted', action='store_true')
 
     p_board_id = argparse.ArgumentParser(add_help=False)
     p_board_id.add_argument('bid', help = 'Trello board id')
@@ -150,7 +170,7 @@ def main(args_):
     list_name = args.list_name;
     list_id = args.list_id;
 
-    todo_cards = filter_file(file_path, filetype = args.lang);
+    todo_cards = searchAllCardsOnFile(file_path, filetype = args.lang);
     if hasattr(args, 'bid'):
         board_id = args.bid;
 
@@ -166,7 +186,11 @@ def main(args_):
         todo_list_id = list_id_API_request(board_id, key, token, 'TODO');
 
     for idx, card in enumerate(todo_cards):
-        post_card_API_request(todo_list_id, key, token, card.name, desc = card.desc);
+        if card.t_id == "":
+            post_card_API_request(todo_list_id, key, token, card);
+            # Write id in TODO comment
+            if args.write_card_id == True:
+                add_id_TODO_comment(file_path,card);
 
 if __name__ == "__main__":
     main(sys.argv)

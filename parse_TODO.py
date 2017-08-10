@@ -14,6 +14,8 @@ import requests
 import json
 
 class Trello_card:
+    def __eq__(self, other):
+            return self.__dict__ == other.__dict__
     def __init__(self, name = "", desc = "", line = 0, t_id = ""):
         self.name = name;
         self.desc = desc;
@@ -98,9 +100,9 @@ def searchAllCardsOnFile(o_file,filetype = None):
                 if card.name == "":
                     card.name = "TODO - " + datetime.datetime.now().strftime("%Y-%m-%d");
 
-            elif card != None and line.startswith(wildcard):
+            elif card is not None and line.startswith(wildcard):
                     desc = desc + line.split(wildcard,1)[1];
-            elif card != None:
+            elif card is not None:
                 # Filter the string so it will remove blank lines
                 if desc != "":
                     card.desc = clean_string(desc);

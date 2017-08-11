@@ -94,7 +94,7 @@ def searchAllCardsOnFile(o_file,filetype = None):
                 card = Trello_card();
                 card.line = idx; # Do not like the solution
                 # Remove the '// TODO ' part of the line
-                card.name = line.split(wildcard + " TODO",1)[1].strip().split(" - ")[0].strip();
+                card.name = line.split(wildcard + " TODO",1)[1].split(" - ")[0].strip();
                 if len(line.split(" - ",1))>1:
                     card.t_id = line.split(" - ",1)[1].strip();
                 if card.name == "":
